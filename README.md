@@ -27,16 +27,12 @@ Estrutura de Pastas
 
 Para que o jogo funcione corretamente (especialmente o áudio), mantenha a seguinte estrutura:
 
-DungeonCrawl/
-├── main.py             # Lógica principal e loop do jogo
-├── game_logic.py       # Classes Hero, Enemy e Character
-├── menu_logic.py       # Lógica dos botões e do menu
-├── sounds/
-│   ├── fundo.mp3       # Sua música de fundo (MP3 ou WAV)
-│   └── hit.wav         # Seu efeito sonoro de colisão
-└── images/
-    ├── hero_idle_1.png # Seus sprites (devem seguir o padrão _idle_N e _walk_N)
-    └── ...
+DungeonCrawl.python/
+└── PgZero/
+    ├── PgZero.py          # Arquivo principal do jogo (código do Pygame Zero)
+    ├── images/            # Sprites e imagens do jogo (personagens, fundo etc.)
+    ├── sounds/            # Efeitos sonoros (colisões, ataques, passos, etc.)
+    └── music/             # Trilhas sonoras ou músicas de fundo
 
 Como Rodar
 
