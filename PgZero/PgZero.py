@@ -1,4 +1,4 @@
-# DungeonCrawl.py - Versão Única Corrigida (Reset, Morte e Inputs Otimizados)
+
 
 import math
 import random
@@ -8,7 +8,7 @@ import pgzrun
 import sys 
 import pygame 
 
-# --- Configurações Globais ---
+
 TITLE = "Dungeon Crawl"
 WIDTH = 800
 HEIGHT = 600
@@ -25,11 +25,11 @@ ENEMY_PATROL_SPEED = (0.3, 0.6)
 MUSIC_NAME = "fundo" 
 HIT_SOUND = "hit"
 
-# --- utilitário ---
+
 def clamp(v, a, b):
     return max(a, min(b, v))
 
-# --- base para sprites animados ---
+
 class AnimatedSprite:
     def __init__(self, x, y, idle_frames, walk_frames):
         self.x = x
@@ -90,7 +90,6 @@ class AnimatedSprite:
         if self.current_image:
              screen.blit(self.current_image, (self.x, self.y)) 
 
-# --- herói ---
 class Hero(AnimatedSprite):
     def __init__(self, gx, gy):
         px = gx * TILE + TILE/2
@@ -100,7 +99,7 @@ class Hero(AnimatedSprite):
         super().__init__(px, py, idle, walk)
         self.gx = gx 
         self.gy = gy 
-        self.health = 5 # Vida inicial do herói
+        self.health = 5 
         self.invulnerable_timer = 0.0 
         self.invulnerable_duration = INVULNERABLE_TIME
 
@@ -122,7 +121,7 @@ class Hero(AnimatedSprite):
     def update(self, dt):
         super().update(dt)
         
-        # Lógica de Invulnerabilidade (pisca-pisca)
+        
         if self.invulnerable_timer > 0:
             self.invulnerable_timer -= dt
             
@@ -137,7 +136,7 @@ class Hero(AnimatedSprite):
              frames = self.walk_frames if self.is_moving else self.idle_frames
              self.current_image = frames[self.frame % len(frames)]
 
-# --- inimigo ---
+
 class Enemy(AnimatedSprite):
     def __init__(self, cx, cy, radius=2):
         px = cx * TILE + TILE/2
@@ -173,7 +172,7 @@ class Enemy(AnimatedSprite):
             
         super().update(dt) 
 
-# --- Botão ---
+
 class Button:
     def __init__(self, rect, text, action, color=(30,30,30)):
         self.rect = rect
@@ -186,7 +185,7 @@ class Button:
         screen.draw.rect(self.rect, (180,180,180))
         screen.draw.text(self.text, center=self.rect.center, fontsize=24, color="white")
 
-# --- Estado do jogo ---
+
 class Game:
     def __init__(self):
         self.in_menu = True
@@ -194,12 +193,12 @@ class Game:
         self.hero = None
         self.enemies = []
         
-        # Botões
+        
         self.btn_start = Button(Rect(300, 200, 200, 56), "Start Game", lambda: self.start())
         self.btn_music = Button(Rect(300, 268, 200, 56), "Music: On", lambda: self.toggle_music())
         self.btn_exit = Button(Rect(300, 336, 200, 56), "Exit", lambda: sys.exit(), color=(50,30,30))
         
-        # Flag para controlar o temporizador agendado
+        
         self.return_to_menu_scheduled = False
 
         self.play_music() 
@@ -222,20 +221,20 @@ class Game:
         except Exception: 
             pass
             
-    # Função que será agendada (volta para o menu)
+    
     def reset_game_state(self):
          self.in_menu = True
          self.return_to_menu_scheduled = False
 
     def start(self):
-        # CORREÇÃO CRÍTICA PARA O RESET:
-        # 1. Cancela o agendamento anterior para evitar que o jogo seja forçado para o menu.
+        
+        
         if self.return_to_menu_scheduled:
             clock.unschedule(self.reset_game_state)
             self.return_to_menu_scheduled = False
 
         self.in_menu = False
-        self.hero = Hero(COLS//2, ROWS//2) # Herói é resetado/criado com vida 5
+        self.hero = Hero(COLS//2, ROWS//2) 
         self.enemies = []
         
         for i in range(4): 
@@ -256,12 +255,12 @@ class Game:
             self.btn_music.text = "Music: Off"
             
 
-# Instância Global do Jogo
+
 game = Game()
 
-# --- Handlers do PgZero ---
+
 def on_key_down(key):
-    # CORREÇÃO: Bloqueia o movimento se o herói morreu
+    
     if game.in_menu or not game.hero or game.hero.is_moving or game.hero.health <= 0:
         return
         
@@ -287,7 +286,7 @@ def on_mouse_down(pos):
             game.btn_music.action()
         elif game.btn_exit.rect.collidepoint(pos):
             game.btn_exit.action()
-    # CORREÇÃO: Bloqueia o clique se o herói morreu
+    
     elif game.hero and not game.hero.is_moving and game.hero.health > 0:
         gx = pos[0] // TILE
         gy = pos[1] // TILE
@@ -299,14 +298,14 @@ def on_mouse_down(pos):
             game.hero.try_move(dx, dy)
         
 
-# --- Loop Principal ---
+
 def update(dt):
     if game.in_menu:
         return
     
     hero = game.hero
     
-    # CORREÇÃO: Se o herói morreu, apenas permite a animação (piscar) e retorna (bloqueia o movimento).
+    
     if hero and hero.health <= 0:
         hero.update(dt) 
         return 
@@ -318,7 +317,7 @@ def update(dt):
         e.consider(hero) 
         e.update(dt)
         
-        # Lógica de Colisão / Dano
+        
         if e.rect.colliderect(hero.rect):
             
             if hero.invulnerable_timer <= 0: 
@@ -332,11 +331,11 @@ def update(dt):
                             pass
                     
                     hero.health -= e.damage 
-                    hero.health = max(0, hero.health) # Garante que a vida não fique negativa
+                    hero.health = max(0, hero.health) 
                     
                     hero.invulnerable_timer = hero.invulnerable_duration 
                     
-                    # Lógica de empurrão
+                    
                     dx = hero.x - e.x
                     dy = hero.y - e.y
                     if abs(dx) > abs(dy):
@@ -347,9 +346,9 @@ def update(dt):
                     if hero.health <= 0:
                         game.stop_music()
                         
-                        # Agenda o retorno ao menu
+                        
                         clock.schedule_unique(game.reset_game_state, 3.0) 
-                        game.return_to_menu_scheduled = True # Define a flag
+                        game.return_to_menu_scheduled = True 
                         
                         return
 
@@ -387,9 +386,9 @@ def draw():
         health_display = max(0, game.hero.health) 
         screen.draw.text(f"Health: {health_display}", (8,8), fontsize=26, color=(255,100,100))
     
-    # Desenha GAME OVER se a vida zerou mas o jogo ainda está no tempo de espera
+    
     if game.hero and game.hero.health <= 0:
         screen.draw.text("GAME OVER", center=(WIDTH//2, HEIGHT//2), fontsize=80, color=(255, 0, 0))
 
-# Inicia o loop do PgZero
+
 pgzrun.go()
